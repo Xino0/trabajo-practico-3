@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Reserva</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Formulario de Registro de Reserva</h1>
+            <form id="reserva-form">
+                <fieldset disabled>
+                    <label for="origen">Origen:</label>
+                    <input type="text" id="origen" name="origen" class="form-control"><br>
+                    <label for="destino">Destino:</label>
+                    <input type="text" id="destino" name="destino" class="form-control"><br>
+                    <label for="fecha_vuelo">Fecha de vuelo:</label>
+                    <input type="date" id="fecha_vuelo" name="fecha_vuelo" class="form-control"><br>
+                    <label for="hora_vuelo">Hora de vuelo:</label>
+                    <input type="time" id="hora_vuelo" name="hora_vuelo" class="form-control"><br>
+                </fieldset>
+                
+                <label>Clase:</label><br>
+                <label for="ejecutiva">Ejecutiva</label>
+                <input type="radio" id="ejecutiva" name="clase" value="ejecutiva">
+                <label for="economica">Económica</label>
+                <input type="radio" id="economica" name="clase" value="economica" checked>
+                <br><br>
+                
+                <label for="cantidad_pasajes">Cantidad de Pasajes:</label>
+                <input type="number" id="cantidad_pasajes" name="cantidad_pasajes" min="1" max="50" class="form-control" required><br>
+    
+                <div id="pasajeros-container"></div>
+            <button id="btn-lista-reservas" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Lista de Reservas
+            </button>
+            
+            <div class="modal fade shadow container-fluid" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Lista de Reservas</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                        <table id="table-reservas" class="table">
+                            <thead>
+                              <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Nombre Completo</th>
+                                <th scope="col">DNI</th>
+                                <th scope="col">Sexo</th>
+                                <th scope="col">Origen</th>
+                                <th scope="col">Destino</th>
+                                <th scope="col">Fecha de Vuelo</th>
+                                <th scope="col">Clase</th>
+                                <th scope="col">Asiento</th>
+                                <th scope="col">Opciones</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                          </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+            <button type="reset" class="btn btn-danger">Cancelar</button>
+            <button type="submit" class="btn btn-success">Aceptar</button>
+        </form>
+
+        <footer>
+            Sitio Oficial de Compañía Argentina-2024
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cantidadPasajesInput = document.getElementById('cantidad_pasajes');
+            const claseInputs = document.querySelectorAll('input[name="clase"]');
+            const pasajerosContainer = document.getElementById('pasajeros-container');
+
+            function actualizarPasajeros() {
+                const cantidadPasajes = parseInt(cantidadPasajesInput.value) || 0;
+                const claseSeleccionada = document.querySelector('input[name="clase"]:checked').value;
+                
+                pasajerosContainer.innerHTML = '';
+
+                for (let i = 0; i < cantidadPasajes; i++) {
+                    const pasajeroDiv = document.createElement('div');
+                    pasajeroDiv.className = 'pasajero';
+                    pasajeroDiv.innerHTML = `
+                        <h4>Pasajero ${i + 1}</h4>
+                        <label>Ubicación:</label>
+                        <select name="ubicacion_${i}" class="form-control">
+                            ${claseSeleccionada === 'ejecutiva' ?
+                                `<option value="ventanilla">Ventanilla</option>
+                                 <option value="pasillo">Pasillo</option>` :
+                                `<option value="ventanilla">Ventanilla</option>
+                                 <option value="centro">Centro</option>
+                                 <option value="pasillo">Pasillo</option>`}
+                        </select><br>
+                        
+                        <label>Nro de Silla:</label>
+                        <input type="number" name="nro_silla_${i}" min="${claseSeleccionada === 'ejecutiva' ? '1' : '9'}" max="${claseSeleccionada === 'ejecutiva' ? '8' : '50'}" class="form-control"><br>
+                        
+                        <label>Apellido y Nombre:</label>
+                        <input type="text" name="apellido_nombre_${i}" maxlength="100" class="form-control" required><br>
+                        
+                        <label>DNI:</label>
+                        <input type="text" name="dni_${i}" pattern="\\d{8}" class="form-control" required><br>
+                        
+                        <label>Fecha de Nacimiento:</label>
+                        <input type="date" name="fecha_nacimiento_${i}" class="form-control"><br>
+                        
+                        <label>Sexo:</label><br>
+                        <label for="femenino_${i}">F</label>
+                        <input type="radio" name="sexo_${i}" value="F">
+                        <label for="masculino_${i}">M</label>
+                        <input type="radio" name="sexo_${i}" value="M"><br><br>
+                        <p id="sexo-error" class="text-danger" style="display: none;">Seleccione un sexo</p>
+                    `;
+                    pasajerosContainer.appendChild(pasajeroDiv);
+                }
+            }
+
+            cantidadPasajesInput.addEventListener('input', actualizarPasajeros);
+            claseInputs.forEach(input => {
+                input.addEventListener('change', actualizarPasajeros);
+            });
+            document.getElementById("reserva-form").addEventListener("submit", validarFormulario);
+
+            let reservas = [];
+
+            class Vuelo {
+                constructor(origen, destino, fecha) {
+                    this.origen = origen;
+                    this.destino = destino;
+                    this.fecha = new Date(fecha).toLocaleDateString('es-AR');
+                }
+
+                mostrarInformacion() {
+                    return `${this.origen} → ${this.destino} el ${this.fecha}`;
+                }
+            }
+
+            class Reserva {
+                constructor(apellidoNombre, dni, sexo, vuelo, clase, asiento) {
+                    this.apellidoNombre = apellidoNombre;
+                    this.dni = dni;
+                    this.sexo = sexo;
+                    this.vuelo = vuelo;
+                    this.clase = clase;
+                    this.asiento = asiento;
+                }
+
+                eliminarReserva(index) {
+                    reservas.splice(index, 1);
+                    actualizarTablaReservas();
+                }
+            }
+
+            function agregarReserva(event) {
+                event.preventDefault();
+
+                const apellidoNombre = document.querySelector('input[name^="apellido_nombre_"]').value;
+                const dni = document.querySelector('input[name^="dni_"]').value;
+                const sexo = document.querySelector('input[name^="sexo_"]:checked').value;
+                const clase = document.querySelector('input[name="clase"]:checked').value;
+                const asiento = document.querySelector('input[name^="nro_silla_"]').value;
+
+                //const origen = document.getElementById('origen').value;
+                //const destino = document.getElementById('destino').value;
+                //const fecha = document.getElementById('fecha_vuelo').value;
+
+                const origen = localStorage.getItem('origen');
+                const destino = localStorage.getItem('destino');
+                const fechaVuelo = localStorage.getItem('fecha_vuelo');
+
+                const vuelo = new Vuelo(origen, destino, fechaVuelo);
+                const reserva = new Reserva(apellidoNombre, dni, sexo, vuelo, clase, asiento);
+
+                reservas.push(reserva);
+                actualizarTablaReservas();
+            }
+
+            function actualizarTablaReservas() {
+                const tabla = document.getElementById('table-reservas').getElementsByTagName('tbody')[0];
+                tabla.innerHTML = '';
+
+                reservas.forEach((reserva, index) => {
+                    const row = tabla.insertRow();
+                    row.insertCell(0).innerText = index + 1;
+                    row.insertCell(1).innerText = reserva.apellidoNombre;
+                    row.insertCell(2).innerText = reserva.dni;
+                    row.insertCell(3).innerText = reserva.sexo;
+                    row.insertCell(4).innerText = reserva.vuelo.origen;
+                    row.insertCell(5).innerText = reserva.vuelo.destino;
+                    row.insertCell(6).innerText = reserva.vuelo.fecha;
+                    row.insertCell(7).innerText = reserva.clase;
+                    row.insertCell(8).innerText = reserva.asiento;
+                    
+                    const eliminarBtn = document.createElement('button');
+                    eliminarBtn.innerText = 'Eliminar';
+                    eliminarBtn.classList.add('btn', 'btn-danger');
+                    eliminarBtn.onclick = () => reserva.eliminarReserva(index);
+                    row.insertCell(9).appendChild(eliminarBtn);
+                });
+            }
+            function validarFormulario(event) {
+                event.preventDefault(); // Evitar el envío del formulario
+            
+                // Obtener el sexo seleccionado
+                const sexoSeleccionado = document.querySelector('input[name^="sexo_"]:checked');
+                const sexoError = document.getElementById('sexo-error');
+            
+                if (!sexoSeleccionado) {
+                    // Mostrar mensaje de error si no se selecciona sexo
+                    sexoError.style.display = 'block';
+                } else {
+                    // Ocultar mensaje de error si se selecciona sexo
+                    sexoError.style.display = 'none';
+            
+                    // Agregar la reserva si la validación pasa
+                    agregarReserva(event);
+                }
+            }            
+        });
+    </script>
+</body>
+</html>
